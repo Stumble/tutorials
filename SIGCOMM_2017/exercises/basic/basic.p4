@@ -34,12 +34,17 @@ header ipv4_t {
 }
 
 struct metadata {
-    /* empty */
+    // empty
 }
 
 struct headers {
     ethernet_t   ethernet;
     ipv4_t       ipv4;
+}
+
+error {
+    Ipv4WrongVersion;
+    Ipv4OptionNotSupported;
 }
 
 /*************************************************************************
@@ -52,7 +57,17 @@ parser MyParser(packet_in packet,
                 inout standard_metadata_t standard_metadata) {
 
     state start {
-        /* TODO: add parser logic */
+        packet.extract(headers.ethernet);
+        transition select(headers.ethernet.etherType) {
+            0x800 : parse_ipv4;
+            // others are ignored
+        }
+    }
+
+    state parse_ipv4 {
+        packet.extract(headers.ipv4);
+        verify(headers.ipv4.version == 4w4, error.Ipv4WrongVersion)
+        verify(headers.ipv4.ihl     == 4w5, error.Ipv4OptionNotSupported)
         transition accept;
     }
 }
@@ -79,7 +94,7 @@ control MyIngress(inout headers hdr,
     }
     
     action ipv4_forward(macAddr_t dstAddr, egressSpec_t port) {
-        /* TODO: fill out code in action body */
+        standard_metadata.egress_spec = port;
     }
     
     table ipv4_lpm {
@@ -142,7 +157,8 @@ control MyComputeChecksum(inout headers hdr, inout metadata meta) {
 
 control MyDeparser(packet_out packet, in headers hdr) {
     apply {
-        /* TODO: add deparser logic */
+        packet.emit(hdr.ethernet)
+        packet.emit(hdr.ipv4)
     }
 }
 
