@@ -43,8 +43,8 @@ struct headers {
 }
 
 error {
-    Ipv4WrongVersion;
-    Ipv4OptionNotSupported;
+    Ipv4WrongVersion,
+    Ipv4OptionNotSupported
 }
 
 /*************************************************************************
@@ -66,8 +66,8 @@ parser MyParser(packet_in packet,
 
     state parse_ipv4 {
         packet.extract(headers.ipv4);
-        verify(headers.ipv4.version == 4w4, error.Ipv4WrongVersion)
-        verify(headers.ipv4.ihl     == 4w5, error.Ipv4OptionNotSupported)
+        verify(headers.ipv4.version == 4w4, error.Ipv4WrongVersion);
+        verify(headers.ipv4.ihl     == 4w5, error.Ipv4OptionNotSupported);
         transition accept;
     }
 }
