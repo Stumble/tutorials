@@ -57,17 +57,17 @@ parser MyParser(packet_in packet,
                 inout standard_metadata_t standard_metadata) {
 
     state start {
-        packet.extract(headers.ethernet);
-        transition select(headers.ethernet.etherType) {
+        packet.extract(hdr.ethernet);
+        transition select(hdr.ethernet.etherType) {
             0x800 : parse_ipv4;
             // others are ignored
         }
     }
 
     state parse_ipv4 {
-        packet.extract(headers.ipv4);
-        verify(headers.ipv4.version == 4w4, error.Ipv4WrongVersion);
-        verify(headers.ipv4.ihl     == 4w5, error.Ipv4OptionNotSupported);
+        packet.extract(hdr.ipv4);
+        verify(hdr.ipv4.version == 4w4, error.Ipv4WrongVersion);
+        verify(hdr.ipv4.ihl     == 4w5, error.Ipv4OptionNotSupported);
         transition accept;
     }
 }
@@ -157,8 +157,8 @@ control MyComputeChecksum(inout headers hdr, inout metadata meta) {
 
 control MyDeparser(packet_out packet, in headers hdr) {
     apply {
-        packet.emit(hdr.ethernet)
-        packet.emit(hdr.ipv4)
+        packet.emit(hdr.ethernet);
+        packet.emit(hdr.ipv4);
     }
 }
 
