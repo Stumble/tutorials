@@ -128,7 +128,7 @@ control MyEgress(inout headers hdr,
                  inout standard_metadata_t standard_metadata) {
     apply {
         if (hdr.ipv4.ecn == 2w1 || hdr.ipv4.ecn == 2w2) {
-            if (standard_metadata.enq_qdepth > ECN_THRESHOLD) {
+            if (standard_metadata.enq_qdepth >= ECN_THRESHOLD) {
                 hdr.ipv4.ecn = 2w3;
             }
         }
