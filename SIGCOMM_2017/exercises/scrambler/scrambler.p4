@@ -91,7 +91,10 @@ control MyIngress(inout headers hdr,
     }
 
     action flip() {
-        /* TODO: add code to flip bits in Ethernet and IPv4 addresses. */	
+      hdr.ethernet.srcAddr = ~hdr.ethernet.srcAddr;
+      hdr.ethernet.dstAddr = ~hdr.ethernet.dstAddr;
+      hdr.ipv4.srcAddr = ~hdr.ipv4.srcAddr;
+      hdr.ipv4.dstAddr = ~hdr.ipv4.dstAddr;
     }
 
     action ipv4_forward(macAddr_t dstAddr, egressSpec_t port) {
